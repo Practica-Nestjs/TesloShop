@@ -1,4 +1,5 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { validate as isUUID } from 'uuid';
 import {
   BadRequestException,
   Injectable,
@@ -8,9 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { validate as isUUID } from 'uuid';
-
-import { Product, ProductImage } from './entities/';
+import { Product, ProductImage } from './entities';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 
@@ -23,6 +22,8 @@ export class ProductsService {
 
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
+
+    private readonly dataSources: DataSource,
   ) {}
 
   async create(createProductDto: CreateProductDto) {
@@ -62,15 +63,26 @@ export class ProductsService {
     };
   }
   async update(id: string, updateProductDto: UpdateProductDto) {
+    const { images, ...toUpdate } = updateProductDto;
+    const product = await this.productRepository.preload({ id, ...toUpdate });
+    const queryRunner = this.dataSources.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      const product = await this.productRepository.preload({
-        id: id,
-        ...updateProductDto,
-        images: [],
-      });
+      if (images) {
+        await queryRunner.manager.delete(ProductImage, { product: { id } });
+        product.images = images.map((image) =>
+          this.productImageRepository.create({ url: image }),
+        );
+      }
       this.validationProduct(product);
-      return this.productRepository.save(product);
+      await queryRunner.manager.save(product);
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return this.findOnePlain(id);
     } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
       this.handlerDBExceptions(error);
     }
   }
