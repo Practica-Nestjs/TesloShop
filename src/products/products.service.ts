@@ -120,6 +120,15 @@ export class ProductsService {
     return true;
   }
 
+  async deleteAllProduct() {
+    const query = this.productRepository.createQueryBuilder('product');
+    try {
+      return await query.delete().where({}).execute();
+    } catch (error) {
+      this.handlerDBExceptions(error);
+    }
+  }
+
   private handlerDBExceptions(error: any) {
     if (error.code === '23505') throw new BadRequestException(error.detail);
     // else throw new NotFoundException(`Product not found in database`);

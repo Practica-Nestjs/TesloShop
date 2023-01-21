@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSeetDto } from './dto/create-seet.dto';
-import { UpdateSeetDto } from './dto/update-seet.dto';
+import { ProductsService } from 'src/products/products.service';
+import { initialData } from './data/seed-data';
 
 @Injectable()
 export class SeetService {
-  create(createSeetDto: CreateSeetDto) {
-    return 'This action adds a new seet';
+  constructor(private readonly productService: ProductsService) {}
+
+  async runSeed() {
+    await this.insertNewProduct();
+
+    return `Seed execute`;
   }
 
-  findAll() {
-    return `This action returns all seet`;
-  }
+  private async insertNewProduct() {
+    await this.productService.deleteAllProduct();
+    const products = initialData.products;
+    const insertPromises = [];
 
-  findOne(id: number) {
-    return `This action returns a #${id} seet`;
-  }
+    products.forEach((product) => {
+      insertPromises.push(this.productService.create(product));
+    });
 
-  update(id: number, updateSeetDto: UpdateSeetDto) {
-    return `This action updates a #${id} seet`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} seet`;
+    await Promise.all(insertPromises);
+    return true;
   }
 }
