@@ -9,7 +9,7 @@ import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 import { SeetModule } from './seet/seet.module';
 import { FilesModule } from './files/files.module';
-// aabf08b9-0f49-40be-8f20-bfee1b102b3d
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -25,6 +25,7 @@ import { FilesModule } from './files/files.module';
     CommonModule,
     SeetModule,
     FilesModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
