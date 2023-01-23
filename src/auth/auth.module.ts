@@ -19,7 +19,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log('JWT SECRET:', configService.get('JWT_SECRET'));
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: { expiresIn: '2h' },
