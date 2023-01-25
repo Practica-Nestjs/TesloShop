@@ -11,11 +11,13 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { FilesService } from './files.service';
 import { fileFiter, fileNamer } from './helpers';
 
+@ApiTags('Files Uploads')
 @Controller('files')
 export class FilesController {
   constructor(
