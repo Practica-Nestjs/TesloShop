@@ -10,6 +10,7 @@ import { CommonModule } from './common/common.module';
 import { SeetModule } from './seet/seet.module';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
+import { MessageWsModule } from './message-ws/message-ws.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -26,6 +27,7 @@ import { AuthModule } from './auth/auth.module';
     SeetModule,
     FilesModule,
     AuthModule,
+    MessageWsModule,
   ],
   controllers: [],
   providers: [],
